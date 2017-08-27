@@ -1,0 +1,45 @@
+grammar Itl
+	rule multiline_expression_list
+		multiline_terminating_space? expression_list multiline_terminating_space? <Program>
+	end
+	rule expression_list
+		first:expression multiline_terminating_space? rest:expression_list <ExpressionList> / '' <EmptyExpressionList>
+	end
+	rule expression
+		(integer / symbol / string / dereference / identifier / grouped / block / space)+ <Expression>
+	end 
+	rule integer
+		[0-9]+ <IntegerLiteral>
+	end
+	rule string
+		'"' ('\"' / !'"' .)* '"' <StringLiteral>
+	end	
+	rule dereference
+		'.' <Dereference>
+	end
+	rule identifier
+		[^{}()| ,;\t\r\n.:]+ <IdentifierLiteral>
+	end
+	rule symbol
+		':' identifier <Symbol>
+	end
+	rule space
+		[ \t]+
+	end
+	rule multiline_terminating_space
+		[ \t\r\n;]+
+	end
+	rule argument
+		identifier space* <Argument>
+	end
+
+	rule argument_list
+		(argument)* <ArgumentList>
+	end
+	rule grouped
+		'(' expression_list (',' expression_list)* ')' <Grouped>
+	end
+	rule block
+		'{' space? '|'  space? argument_list  space? '|' multiline_expression_list '}' <Block>
+	end
+end
